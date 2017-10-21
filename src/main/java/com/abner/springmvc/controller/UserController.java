@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,33 +17,59 @@ import com.abner.springmvc.model.User;
 //implement CRUD in one controller
 
 @Controller
+@RequestMapping("/user")
 public class UserController {
 
 	Map<String, User> userMap = new HashMap<String, User>();
 	
-	@RequestMapping(value="/user/users", method=RequestMethod.GET)
+	@RequestMapping(value="/users", method=RequestMethod.GET)
 	public String showAllUsers(Model model){
 		model.addAttribute("result", userMap);
 		return "users";
 	}
 	
-	@RequestMapping(value="/user/{username}", method=RequestMethod.GET)
+	@RequestMapping(value="/{username}", method=RequestMethod.GET)
 	public String findUser(@PathVariable String username, Model model){
 		model.addAttribute("result", userMap.get(username));
 		return "user";
 	}
 	
-	@RequestMapping(value="/user/newuser", method=RequestMethod.GET)
+	@RequestMapping(value="/newuser", method=RequestMethod.GET)
 	public String addUser(Model model){
 		model.addAttribute(new User());
 		return "newuser";
 	}
 	
-	@RequestMapping(value="/user/newuser", method=RequestMethod.POST)
-	public String addUser(@ModelAttribute User user){
+	@RequestMapping(value="/newuser", method=RequestMethod.POST)
+	public String addUser(@ModelAttribute User user, BindingResult br){
+		if(br.hasErrors()){
+			return "updateuser";
+		}
 		userMap.put(user.getUsername(), user);
 		return "redirect:users";
 	}
+	
+	@RequestMapping(value="/{username}/update", method=RequestMethod.GET)
+	public String updateUser(@PathVariable String username, Model model){
+		model.addAttribute(userMap.get(username));
+		return "updateuser";
+	}
+	
+	@RequestMapping(value="/{username}/update", method=RequestMethod.POST)
+	public String updateUser(@Validated User user, BindingResult br){
+		if(br.hasErrors()){
+			return "updateuser";
+		}
+		userMap.put(user.getUsername(),user);
+		return "redirect:/user/users";
+	}
+	
+	@RequestMapping(value="/{username}/delete", method=RequestMethod.GET)
+	public String deleteUser(@PathVariable String username, Model model){
+		userMap.remove(username);
+		return "redirect:/user/users";
+	}
+	
 	
 	public UserController(){
 		User user1 = new User("Sam", 40);

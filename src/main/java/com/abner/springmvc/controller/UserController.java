@@ -3,7 +3,6 @@ package com.abner.springmvc.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.abner.springmvc.model.User;
+import com.abner.springmvc.model.UserImpl;
 
 //implement CRUD in one controller
 
@@ -22,7 +21,7 @@ import com.abner.springmvc.model.User;
 @RequestMapping("/user")
 public class UserController {
 
-	Map<String, User> userMap = new HashMap<String, User>();
+	Map<String, UserImpl> userMap = new HashMap<String, UserImpl>();
 	
 	@RequestMapping(value="/users", method=RequestMethod.GET)
 	public String showAllUsers(Model model){
@@ -38,16 +37,16 @@ public class UserController {
 	
 	@RequestMapping(value="/newuser", method=RequestMethod.GET)
 	public String addUser(Model model){
-		model.addAttribute(new User());
+		model.addAttribute(new UserImpl());
 		return "newuser";
 	}
 	
 	@RequestMapping(value="/newuser", method=RequestMethod.POST)
-	public String addUser(@ModelAttribute User user, BindingResult br){
+	public String addUser(@ModelAttribute UserImpl user, BindingResult br){
 		if(br.hasErrors()){
 			return "updateuser";
 		}
-		userMap.put(user.getUsername(), user);
+		userMap.put(user.getUserName(), user);
 		return "redirect:users";
 	}
 	
@@ -58,11 +57,11 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/{username}/update", method=RequestMethod.POST)
-	public String updateUser(@Validated User user, BindingResult br){
+	public String updateUser(@Validated UserImpl user, BindingResult br){
 		if(br.hasErrors()){
 			return "updateuser";
 		}
-		userMap.put(user.getUsername(),user);
+		userMap.put(user.getUserName(),user);
 		return "redirect:/user/users";
 	}
 	
@@ -86,9 +85,9 @@ public class UserController {
 	}
 	
 	public UserController(){
-		User user1 = new User("Sam", 40);
-		User user2 = new User("Tony", 28);
-		userMap.put(user1.getUsername(), user1);
-		userMap.put(user2.getUsername(), user2);
+		UserImpl user1 = new UserImpl("Sam", 40);
+		UserImpl user2 = new UserImpl("Tony", 28);
+		userMap.put(user1.getUserName(), user1);
+		userMap.put(user2.getUserName(), user2);
 	}
 }
